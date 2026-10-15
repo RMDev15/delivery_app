@@ -1,0 +1,71 @@
+<div class="delivery-container">
+  <!-- Cabeçalho / Localização -->
+  <header class="header">
+    <div class="location">
+      <span class="city">{{ selectedLocation }}</span>
+      <span class="dropdown-icon">▼</span>
+    </div>
+    <div class="notification">
+      <i class="bell-icon">🔔</i>
+    </div>
+  </header>
+
+  <!-- Banner Promocional -->
+  <section class="banner-section">
+    <div class="banner">
+      <div class="banner-content">
+        <h2>SUPER Delicious</h2>
+        <h1>BURGER</h1>
+        <p>Today best deal</p>
+        <button class="order-btn">ORDER NOW</button>
+      </div>
+      <div class="discount-badge">50% Off</div>
+    </div>
+  </section>
+
+  <!-- Comidas Recomendadas -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Comidas Recomendadas</h2>
+      <a href="#" class="see-more">Ver mais</a>
+    </div>
+    
+    <div class="horizontal-scroll">
+      <div class="food-card" *ngFor="let food of foods">
+        <div class="card-image-wrapper">
+          <img [src]="food.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'" [alt]="food.name">
+          <span class="rating">⭐ {{ food.rating || '4.8' }}</span>
+        </div>
+        <div class="card-info">
+          <span class="price">R$ {{ food.price }}</span>
+          <h3 class="title">{{ food.name }}</h3>
+          <p class="details">{{ food.deliveryTime || '50-60 min' }} - R$ {{ food.deliveryFee || '5.99' }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Restaurantes Recomendados -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Restaurantes Recomendados</h2>
+      <a href="#" class="see-more">Ver todos</a>
+    </div>
+
+    <div class="horizontal-scroll restaurants-scroll">
+      <div class="restaurant-card" *ngFor="let rest of restaurants">
+        <div class="restaurant-logo">
+          <img [src]="rest.image || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5'" [alt]="rest.name">
+        </div>
+        <span class="restaurant-name">{{ rest.name }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Navegação Inferior -->
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">🏠</a>
+    <a href="#" class="nav-item">🔍</a>
+    <a href="#" class="nav-item">👤</a>
+  </nav>
+</div>

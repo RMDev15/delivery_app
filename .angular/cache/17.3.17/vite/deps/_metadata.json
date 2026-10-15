@@ -1,0 +1,61 @@
+{
+  "hash": "aaeddcdf",
+  "configHash": "c28d2143",
+  "lockfileHash": "87c02118",
+  "browserHash": "0cd51b99",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "0a2cfb68",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "dca1fc0d",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "e6f0da9e",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "0f606c02",
+      "needsInterop": false
+    },
+    "@supabase/supabase-js": {
+      "src": "../../../../../node_modules/@supabase/supabase-js/dist/index.mjs",
+      "file": "@supabase_supabase-js.js",
+      "fileHash": "fa8f6e26",
+      "needsInterop": false
+    },
+    "rxjs": {
+      "src": "../../../../../node_modules/rxjs/dist/esm5/index.js",
+      "file": "rxjs.js",
+      "fileHash": "9484f7ab",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-QYFYS35U": {
+      "file": "chunk-QYFYS35U.js"
+    },
+    "chunk-USWG7SWM": {
+      "file": "chunk-USWG7SWM.js"
+    },
+    "chunk-POHGZKK5": {
+      "file": "chunk-POHGZKK5.js"
+    },
+    "chunk-PY24JFG2": {
+      "file": "chunk-PY24JFG2.js"
+    },
+    "chunk-AH636IQZ": {
+      "file": "chunk-AH636IQZ.js"
+    }
+  }
+}
