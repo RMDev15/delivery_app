@@ -1,0 +1,282 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #ffffff;
+  position: relative;
+  z-index: 50;
+}
+
+.location-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  color: #2f3542;
+}
+
+.dropdown-icon {
+  font-size: 10px;
+  margin-left: 6px;
+  color: #ff4757;
+}
+
+/* Dropdown de Cidades */
+.location-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 8px;
+  width: 160px;
+  overflow: hidden;
+  border: 1px solid #f1f2f6;
+}
+
+.location-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #2f3542;
+  transition: background 0.2s;
+}
+
+.location-item:hover {
+  background: #f8f9fa;
+  color: #ff4757;
+  font-weight: 600;
+}
+
+.bell-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Banner Promocional em Carrossel */
+.banner-section {
+  padding: 0 20px;
+  margin-bottom: 24px;
+}
+
+.banner {
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: background 0.5s ease-in-out;
+  min-height: 140px;
+}
+
+.banner-content h2 {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.banner-content h1 {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 4px 0;
+}
+
+.banner-content p {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 12px;
+}
+
+.order-btn {
+  background: #ffffff;
+  color: #ff4757;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.discount-badge {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.carousel-dots span {
+  width: 6px;
+  height: 6px;
+  background: #dcdde1;
+  border-radius: 50%;
+  transition: width 0.3s, background 0.3s;
+}
+
+.carousel-dots span.active {
+  width: 18px;
+  border-radius: 4px;
+  background: #ff4757;
+}
+
+/* Secções */
+.section {
+  margin-bottom: 28px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2f3542;
+}
+
+.see-more {
+  font-size: 13px;
+  color: #ff4757;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.see-more:hover {
+  text-decoration: underline;
+}
+
+/* Scroll Horizontal Fluido */
+.horizontal-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 20px 12px 20px;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Cards de Comida */
+.food-card {
+  min-width: 160px;
+  max-width: 160px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid #f1f2f6;
+}
+
+.card-image-wrapper {
+  position: relative;
+  height: 120px;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rating {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.card-info {
+  padding: 10px;
+}
+
+.price {
+  color: #2ed573;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2f3542;
+  margin: 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.details {
+  font-size: 11px;
+  color: #a4b0be;
+}
+
+/* Cards de Restaurantes */
+.restaurants-scroll .restaurant-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 75px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.restaurant-logo {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border: 2px solid #ff4757;
+  margin-bottom: 6px;
+}
+
+.restaurant-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurant-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2f3542;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 75px;
+}

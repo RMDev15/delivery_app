@@ -1,38 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from './services/api.service';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  foods: any[] = [];
-  restaurants: any[] = [];
-  selectedLocation: string = 'Taquara, RS';
-
-  constructor(private apiService: ApiService) {}
-
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  loadData() {
-    this.apiService.getFoods().subscribe({
-      next: (data) => {
-        this.foods = data;
-      },
-      error: (err) => console.error('Erro ao buscar comidas:', err)
-    });
-
-    this.apiService.getRestaurants().subscribe({
-      next: (data) => {
-        this.restaurants = data;
-      },
-      error: (err) => console.error('Erro ao buscar restaurantes:', err)
-    });
-  }
-}
+export class AppComponent {}  

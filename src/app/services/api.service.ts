@@ -1,65 +1,51 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 import { from, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private supabase: SupabaseClient;
+  constructor(private supabaseService: SupabaseService) {}
 
-  constructor() {
-    this.supabase = createClient(
-      'https://ubnwbppegpxdgmxprqth.supabase.co', 
-      'sb_publishable_tIxN_nsKL6ijYgcpMBKoRA_EP5arpVK'
-    );
-  }
-
-  getUsers(): Observable<any> {
-    const promise = this.supabase.from('profiles').select('*').then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
+  getFoods(): Observable<any[]> {
+    const promise = this.supabaseService.client
+      .from('foods')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Erro ao buscar foods do Supabase:', error);
+          throw error;
+        }
+        console.log('Foods vindos do Supabase:', data);
+        return (data || []).map(item => ({
+          ...item,
+          image: item.image_url,
+          rating: 4.8,
+          deliveryTime: '30-40 min',
+          deliveryFee: 5.99
+        }));
+      });
     return from(promise);
   }
 
-  getUser(id: string): Observable<any> {
-    const promise = this.supabase.from('profiles').select('*').eq('id', id).single().then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
-    return from(promise);
-  }
-
-  getRestaurants(): Observable<any> {
-    const promise = this.supabase.from('restaurants').select('*').then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
-    return from(promise);
-  }
-
-  getRestaurant(id: number): Observable<any> {
-    const promise = this.supabase.from('restaurants').select('*').eq('id', id).single().then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
-    return from(promise);
-  }
-
-  getFoods(): Observable<any> {
-    const promise = this.supabase.from('foods').select('*').then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
-    return from(promise);
-  }
-
-  getFood(id: number): Observable<any> {
-    const promise = this.supabase.from('foods').select('*').eq('id', id).single().then(({ data, error }) => {
-      if (error) throw error;
-      return data;
-    });
+  getRestaurants(): Observable<any[]> {
+    const promise = this.supabaseService.client
+      .from('restaurants')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Erro ao buscar restaurants do Supabase:', error);
+          throw error;
+        }
+        console.log('Restaurants vindos do Supabase:', data);
+        return (data || []).map(item => ({
+          ...item,
+          image: item.image_url,
+          category: item.cuisine
+        }));
+      });
     return from(promise);
   }
 }
