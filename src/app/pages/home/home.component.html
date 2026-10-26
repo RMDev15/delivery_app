@@ -92,7 +92,7 @@
     </div>
   </div>
   <div class="horizontal-scroll restaurants-scroll" #restScroll>
-    <div class="restaurant-card" *ngFor="let rest of restaurants" [routerLink]="['/restaurante', rest.id]" style="cursor: pointer;">
+    <div class="restaurant-card" *ngFor="let rest of restaurants" [routerLink]="['/restaurant-detail', rest.id]" style="cursor: pointer;">
       <div class="restaurant-logo">
         <img [src]="rest.image_url || rest.image" [alt]="rest.name">
       </div>

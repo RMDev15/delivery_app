@@ -200,12 +200,12 @@
   text-decoration: underline;
 }
 
-/* Scroll Horizontal Fluido com Animação Smooth */
+/* Scroll Horizontal com padding extra para evitar corte no hover scale */
 .horizontal-scroll {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding: 4px 20px 12px 20px;
+  padding: 12px 20px 20px 20px;
   scrollbar-width: none;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
@@ -314,23 +314,23 @@
 
 /* Efeitos de Hover e Destaque nos Cards do Carrossel */
 .food-card, .restaurant-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, filter 0.25s ease;
   will-change: transform;
 }
 
 .food-card:hover {
-  transform: scale(1.08) translateY(-4px);
-  box-shadow: 0 12px 24px rgba(255, 71, 87, 0.25);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 12px 24px rgba(255, 71, 87, 0.18);
   z-index: 10;
-  filter: brightness(1.03);
+  filter: brightness(1.02);
 }
 
 .restaurant-card:hover {
-  transform: scale(1.12);
+  transform: translateY(-3px) scale(1.08);
   z-index: 10;
 }
 
 .restaurant-card:hover .restaurant-logo {
   border-color: #ff4757;
-  box-shadow: 0 6px 16px rgba(255, 71, 87, 0.4);
+  box-shadow: 0 6px 16px rgba(255, 71, 87, 0.35);
 }
