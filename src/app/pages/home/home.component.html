@@ -1,3 +1,5 @@
+
+
 <header class="header">
   <div class="location-wrapper" (click)="toggleLocationMenu($event)">
     <div class="location">
@@ -123,6 +125,8 @@
   </div>
 </section>
 
+
+
 <!-- Modal de Produto Selecionado na Home -->
 <div class="modal-overlay" *ngIf="selectedProduct" (click)="closeProductModal()" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
   <div class="modal-content" (click)="$event.stopPropagation()" style="background:white; padding:20px; border-radius:12px; width:90%; max-width:400px; position:relative;">
@@ -149,6 +153,7 @@
       </button>
     </div>
   </div>
+ 
 </div>
 
-<app-cart-drawer></app-cart-drawer>
+     <app-cart-drawer></app-cart-drawer>
