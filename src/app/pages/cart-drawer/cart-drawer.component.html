@@ -1,0 +1,112 @@
+<!-- Botão flutuante do Carrinho -->
+<button class="cart-floating-btn" (click)="toggleDrawer()">
+  🛒 Carrinho 
+  <span class="badge" *ngIf="(cartService.items$ | async)?.length as len">{{ len }}</span>
+</button>
+
+<!-- Gaveta Lateral (Drawer) -->
+<div class="cart-overlay" *ngIf="isOpen" (click)="toggleDrawer()">
+  <div class="cart-drawer" (click)="$event.stopPropagation()">
+    
+    <div class="cart-header">
+      <h2>Seu Pedido</h2>
+      <button class="close-btn" (click)="toggleDrawer()">✕</button>
+    </div>
+
+    <!-- Lista com scroll vertical garantido -->
+    <div class="cart-items-list" *ngIf="(cartService.items$ | async)?.length; else emptyCart">
+      <div class="restaurant-origin" *ngIf="(cartService.items$ | async)?.[0] as first">
+        📍 <strong>{{ first.restaurantName }}</strong>
+      </div>
+
+      <div *ngFor="let item of (cartService.items$ | async)" class="cart-item">
+        <img [src]="item.image_url || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=100&q=80'" [alt]="item.name" />
+        <div class="item-details">
+          <h4>{{ item.name }}</h4>
+          <p class="item-price">R$ {{ item.price | number:'1.2-2' }}</p>
+          <div class="item-controls">
+            <button (click)="updateQty(item, -1)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button (click)="updateQty(item, 1)">+</button>
+            <button class="remove-item" (click)="removeItem(item)">🗑️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sugestões de aditivos do mesmo estabelecimento -->
+      <div class="cart-suggestions">
+        <h5>💡 Sugestões da mesma empresa:</h5>
+        <div *ngFor="let sug of sameRestaurantSuggestions" class="suggestion-card">
+          <span>{{ sug.name }} - R$ {{ sug.price | number:'1.2-2' }}</span>
+          <button class="add-suggestion-btn" (click)="addSuggestion(sug)">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Cupons -->
+      <div class="coupon-section">
+        <div class="coupon-input-group">
+          <input type="text" [(ngModel)]="couponInput" placeholder="Possui cupom? (Ex: XIS123456)" />
+          <button (click)="applyEnteredCoupon()">Aplicar</button>
+        </div>
+        <p class="coupon-feedback-msg" *ngIf="couponMessage">{{ couponMessage }}</p>
+      </div>
+
+      <!-- Lista de Cupons Ativos -->
+      <div class="active-coupons-list" *ngIf="(cartService.activeCoupons$ | async)?.length as cLen">
+        <div *ngFor="let coupon of (cartService.activeCoupons$ | async)" class="active-coupon-badge">
+          <div>
+            <span class="coupon-code-tag">🎫 {{ coupon.code }}</span>
+            <span class="coupon-status" [class.invalid]="!coupon.isValidForCurrentItems">
+              {{ coupon.isValidForCurrentItems ? '✅ Ativo' : '⚠️ Inválido p/ produtos' }}
+            </span>
+          </div>
+          <button class="remove-coupon-btn" (click)="removeCoupon(coupon.code)">✕</button>
+        </div>
+      </div>
+
+      <!-- Resumo de Valores -->
+      <div class="cart-summary">
+        <div class="summary-line">
+          <span>Subtotal:</span>
+          <span>R$ {{ cartService.getSubtotal() | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-line discount" *ngIf="cartService.getDiscountAmount() > 0">
+          <span>Desconto Cupom:</span>
+          <span>- R$ {{ cartService.getDiscountAmount() | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-line">
+          <span>Taxa de Entrega:</span>
+          <span>{{ cartService.getDeliveryFee() === 0 ? 'Grátis' : 'R$ 4,99' }}</span>
+        </div>
+        <div class="summary-line total">
+          <span>Total:</span>
+          <span>R$ {{ cartService.getTotal() | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <button class="btn-checkout" (click)="checkout()">Finalizar Pedido</button>
+    </div>
+
+    <ng-template #emptyCart>
+      <div class="empty-cart">
+        <p>Seu carrinho está vazio 🍽️</p>
+      </div>
+    </ng-template>
+
+  </div>
+</div>
+
+<!-- Modal de Escolha de Pagamento Fictício (PIX ou Cartão) -->
+<div class="payment-modal-overlay" *ngIf="showPaymentModal">
+  <div class="payment-modal">
+    <h3>💳 Área de Pagamento </h3>
+    <p>Escolha a forma de pagamento simulada:</p>
+    
+    <div class="payment-options">
+      <button class="payment-btn" (click)="confirmPayment('PIX')">⚡ PIX (Aprovação Instantânea)</button>
+      <button class="payment-btn" (click)="confirmPayment('Cartão de Crédito')">💳 Cartão de Crédito Fictício</button>
+    </div>
+
+    <button (click)="showPaymentModal = false" class="cancel-payment-btn">Cancelar</button>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="search-page-container">
+  <h2>🔍 Pesquisa Regional (Vale do Sinos / Paranhana)</h2>
+  
+  <div class="search-input-wrapper">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (input)="onSearch()" 
+      placeholder="Pesquise por loja, região, cidade ou prato (ex: XIS, Taquara, Pizza)..." 
+    />
+  </div>
+
+  <div class="search-results-section">
+    <h3>Lojas e Regiões Encontradas</h3>
+    <div class="grid-list" *ngIf="filteredRestaurants.length > 0; else noRests">
+      <!-- Adicionado [routerLink] e cursor para tornar o card clicável -->
+      <div 
+        *ngFor="let rest of filteredRestaurants" 
+        class="result-card restaurant-card-clickable"
+        [routerLink]="['/restaurant-detail', rest.id]"
+      >
+        <div class="rest-card-content">
+          <h4>📍 {{ rest.name }}</h4>
+          <p>{{ rest.city || 'Região Metropolitana' }} • {{ rest.category || 'Alimentação' }}</p>
+        </div>
+        <span class="view-menu-btn">Ver Cardápio ➔</span>
+      </div>
+    </div>
+    <ng-template #noRests><p class="empty-text">Nenhuma loja encontrada.</p></ng-template>
+
+    <h3>Produtos e Pratos</h3>
+    <div class="grid-list" *ngIf="filteredFoods.length > 0; else noFoods">
+      <div *ngFor="let food of filteredFoods" class="result-card product-card">
+        <img [src]="food.image_url || food.image" [alt]="food.name" />
+        <div class="prod-info">
+          <h4>{{ food.name }}</h4>
+          <p class="price">R$ {{ food.price | number:'1.2-2' }}</p>
+          <button (click)="addToCart(food)">Adicionar ao Carrinho</button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noFoods><p class="empty-text">Nenhum produto encontrado.</p></ng-template>
+  </div>
+
+  <!-- Componente do Carrinho Flutuante -->
+  <app-cart-drawer></app-cart-drawer>
+</div>

@@ -1,180 +1,220 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
+import { SupabaseService } from '../../services/supabase.service';
+import { CartService } from '../../services/cart.service';
+import { CartDrawerComponent } from '../cart-drawer/cart-drawer.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule, CartDrawerComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  allFoods: any[] = [];
-  allRestaurants: any[] = [];
   foods: any[] = [];
   burgers: any[] = [];
   restaurants: any[] = [];
   drinksAndDesserts: any[] = [];
 
-  selectedLocation: string = 'Taquara, RS';
+  selectedLocation: string = 'Todas as Cidades';
   showLocationMenu: boolean = false;
 
+  selectedProduct: any = null;
+  productQuantity: number = 1;
+  productObs: string = '';
+
   locations: string[] = [
-    'Taquara, RS',
+    'Todas as Cidades',
     'Parobé, RS',
+    'Taquara, RS',
     'Igrejinha, RS',
-    'Sapiranga, RS'
+    'Sapiranga, RS',
+    'Novo Hamburgo, RS',
+    'Três Coroas, RS',
+    'Rolante, RS',
+    'Nova Hartz, RS',
+    'Araricá, RS'
   ];
 
-  // Carrossel do Banner
   banners = [
-    { title: 'XIS ESPECIAL', subtitle: 'O melhor sabor da região', discount: 'R$ 10 OFF', bg: 'linear-gradient(135deg, #ff4757 0%, #ff6b81 100%)' },
-    { title: 'PIZZA EM DOBRO', subtitle: 'Terça e Quarta imperdível', discount: '50% Off', bg: 'linear-gradient(135deg, #ff9f43 0%, #ff5252 100%)' },
-    { title: 'ENTREGA GRÁTIS', subtitle: 'Em restaurantes parceiros', discount: 'Frete R$ 0', bg: 'linear-gradient(135deg, #2ed573 0%, #1e90ff 100%)' }
+    { title: 'XIS ESPECIAL', subtitle: 'O melhor sabor da região', discount: 'R$ 10 OFF', codeType: 'XIS', bg: 'linear-gradient(135deg, #ff4757 0%, #ff6b81 100%)' },
+    { title: 'PIZZA EM DOBRO', subtitle: 'Terça e Quarta imperdível', discount: '50% Off', codeType: 'PIZZA', bg: 'linear-gradient(135deg, #ff9f43 0%, #ff5252 100%)' },
+    { title: 'ENTREGA GRÁTIS', subtitle: 'Em restaurantes parceiros', discount: 'Frete R$ 0', codeType: 'FRETE', bg: 'linear-gradient(135deg, #2ed573 0%, #1e90ff 100%)' }
   ];
   currentBannerIndex = 0;
 
-  // Timers dos carrosséis
   bannerInterval: any;
-  foodsInterval: any;
-  burgersInterval: any;
-  restaurantsInterval: any;
-  drinksInterval: any;
+  autoScrollInterval: any;
+  realtimeSubscription: any;
 
-  // Referências dos Containers para Scroll Automático e Manual
   @ViewChild('foodScroll', { read: ElementRef }) foodScroll!: ElementRef;
   @ViewChild('burgerScroll', { read: ElementRef }) burgerScroll!: ElementRef;
   @ViewChild('restScroll', { read: ElementRef }) restScroll!: ElementRef;
   @ViewChild('drinkScroll', { read: ElementRef }) drinkScroll!: ElementRef;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private supabaseService: SupabaseService,
+    public cartService: CartService
+  ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    this.loadDataByCity(this.selectedLocation);
     this.startAutoCarousels();
+    this.initRealtimeListener();
   }
 
   ngOnDestroy(): void {
     this.stopAutoCarousels();
+    if (this.realtimeSubscription) {
+      this.supabaseService.client.removeChannel(this.realtimeSubscription);
+    }
+  }
+
+  initRealtimeListener() {
+    this.realtimeSubscription = this.supabaseService.client
+      .channel('public-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'foods' },
+        () => this.loadDataByCity(this.selectedLocation)
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'restaurants' },
+        () => this.loadDataByCity(this.selectedLocation)
+      )
+      .subscribe();
   }
 
   startAutoCarousels() {
-    // Carrossel do Banner principal
     this.bannerInterval = setInterval(() => {
       this.currentBannerIndex = (this.currentBannerIndex + 1) % this.banners.length;
     }, 4000);
 
-    // Carrossel de Comidas Recomendadas (desliza para a direita a cada 3.5s)
-    this.foodsInterval = setInterval(() => {
-      this.autoScroll(this.foodScroll, 180);
-    }, 3500);
-
-    // Carrossel de X-Burgers & Artesanais (desliza a cada 4s)
-    this.burgersInterval = setInterval(() => {
-      this.autoScroll(this.burgerScroll, 180);
-    }, 4000);
-
-    // Carrossel de Restaurantes Recomendados (desliza a cada 3s)
-    this.restaurantsInterval = setInterval(() => {
-      this.autoScroll(this.restScroll, 120);
-    }, 3000);
-
-    // Carrossel de Bebidas & Sobremesas (desliza a cada 4.5s)
-    this.drinksInterval = setInterval(() => {
-      this.autoScroll(this.drinkScroll, 180);
-    }, 4500);
+    this.autoScrollInterval = setInterval(() => {
+      this.stepAutoScroll(this.foodScroll);
+      this.stepAutoScroll(this.burgerScroll);
+      this.stepAutoScroll(this.restScroll);
+      this.stepAutoScroll(this.drinkScroll);
+    }, 2500);
   }
 
   stopAutoCarousels() {
     if (this.bannerInterval) clearInterval(this.bannerInterval);
-    if (this.foodsInterval) clearInterval(this.foodsInterval);
-    if (this.burgersInterval) clearInterval(this.burgersInterval);
-    if (this.restaurantsInterval) clearInterval(this.restaurantsInterval);
-    if (this.drinksInterval) clearInterval(this.drinksInterval);
+    if (this.autoScrollInterval) clearInterval(this.autoScrollInterval);
   }
 
-// Função de rolagem automática contínua
-  autoScroll(container: ElementRef, step: number) {
+  stepAutoScroll(container: ElementRef) {
     if (container && container.nativeElement) {
       const el = container.nativeElement;
       const maxScroll = el.scrollWidth - el.clientWidth;
-      
-      if (el.scrollLeft >= maxScroll - 10) {
+      if (el.scrollLeft >= maxScroll - 5) {
         el.scrollTo({ left: 0, behavior: 'smooth' });
       } else {
-        el.scrollBy({ left: step, behavior: 'smooth' });
+        el.scrollBy({ left: 180, behavior: 'smooth' });
       }
     }
   }
 
-  // Scroll manual via botões direcionais recebendo o elemento nativo diretamente
   scrollManual(element: HTMLElement, direction: number) {
     if (element) {
       element.scrollBy({ left: direction * 220, behavior: 'smooth' });
     }
   }
 
-  toggleLocationMenu() {
+  toggleLocationMenu(event?: Event) {
+    if (event) event.stopPropagation();
     this.showLocationMenu = !this.showLocationMenu;
   }
 
-  selectLocation(loc: string) {
+  selectLocation(loc: string, event?: Event) {
+    if (event) event.stopPropagation();
     this.selectedLocation = loc;
     this.showLocationMenu = false;
-    this.filterDataByLocation();
+    this.loadDataByCity(loc);
   }
 
-  loadData() {
-    this.apiService.getFoods().subscribe({
-      next: (data) => {
-        this.allFoods = data;
-        this.filterDataByLocation();
-      },
-      error: (err) => console.error('Erro ao buscar comidas:', err)
-    });
-
-    this.apiService.getRestaurants().subscribe({
-      next: (data) => {
-        this.allRestaurants = data;
-        this.filterDataByLocation();
-      },
-      error: (err) => console.error('Erro ao buscar restaurantes:', err)
-    });
-
-    // Dados fixos para Bebidas & Sobremesas
-    this.drinksAndDesserts = [
-      { name: 'Milkshake de Ninho', price: 16.90, rating: 4.8, time: '15-25 min', fee: '4.99', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Petit Gateau', price: 14.00, rating: 4.9, time: '20-30 min', fee: '5.00', image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Açaí Tradicional 500ml', price: 22.00, rating: 4.7, time: '15-20 min', fee: '3.99', image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=500&q=80' },
-      { name: 'Suco Natural Laranja 1L', price: 12.00, rating: 4.6, time: '10-20 min', fee: '3.00', image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=500&q=80' }
-    ];
+  openProductModal(product: any) {
+    this.selectedProduct = product;
+    this.productQuantity = 1;
+    this.productObs = '';
   }
 
-  // Filtro real por cidade selecionada
-  filterDataByLocation() {
-    if (this.selectedLocation === 'Taquara, RS') {
-      this.foods = this.allFoods.filter((_, i) => i % 2 === 0);
-      this.burgers = this.allFoods.filter((_, i) => i % 2 !== 0);
-      this.restaurants = this.allRestaurants.slice(0, 4);
-    } else if (this.selectedLocation === 'Parobé, RS') {
-      this.foods = this.allFoods.filter((_, i) => i % 3 === 0);
-      this.burgers = this.allFoods.slice(1, 4);
-      this.restaurants = this.allRestaurants.slice(1, 5);
-    } else if (this.selectedLocation === 'Igrejinha, RS') {
-      this.foods = this.allFoods.filter((_, i) => i % 2 !== 0);
-      this.burgers = this.allFoods.slice(0, 3);
-      this.restaurants = this.allRestaurants.slice(2, 6);
-    } else {
-      // Sapiranga
-      this.foods = this.allFoods;
-      this.burgers = this.allFoods;
-      this.restaurants = this.allRestaurants;
+  closeProductModal() {
+    this.selectedProduct = null;
+  }
+
+  addToCartFromHome() {
+    if (this.selectedProduct) {
+      const dummyRestaurant = { 
+        id: this.selectedProduct.restaurant_id || 1, 
+        name: this.selectedProduct.restaurants?.name || 'Estabelecimento Regional' 
+      };
+      this.cartService.addToCart(this.selectedProduct, dummyRestaurant, this.productQuantity, this.productObs);
+      this.closeProductModal();
+      alert('🎉 Produto adicionado ao carrinho!');
     }
+  }
 
-    if (this.foods.length === 0) this.foods = this.allFoods;
-    if (this.burgers.length === 0) this.burgers = this.allFoods;
-    if (this.restaurants.length === 0) this.restaurants = this.allRestaurants;
+  // Gera códigos aleatórios de 6 dígitos sem conflitar com o estado anterior
+  onBannerClick(banner: any) {
+    let prefix = 'DISC';
+    if (banner.codeType === 'XIS') prefix = 'XIS';
+    else if (banner.codeType === 'PIZZA') prefix = 'PIZZA';
+    else if (banner.codeType === 'FRETE') prefix = 'FRETE';
+
+    const randomSixDigits = Math.floor(100000 + Math.random() * 900000);
+    const generatedCoupon = `${prefix}${randomSixDigits}`;
+
+    const result = this.cartService.applyCouponCode(generatedCoupon);
+    alert(`${result.message}\n(Código dinâmico: ${generatedCoupon})`);
+  }
+
+  loadDataByCity(city: string) {
+    this.apiService.getRestaurantsByCity(city).subscribe({
+      next: (data) => {
+        // Atribui cupons de 6 dígitos e aplica 70% de chance de múltiplos cupons por empresa
+        this.restaurants = (data || []).map((rest: any) => {
+          const coupons: string[] = [];
+          const firstCode = Math.floor(100000 + Math.random() * 900000).toString();
+          coupons.push(`REG${firstCode}`);
+
+          if (Math.random() < 0.7) {
+            const secondCode = Math.floor(100000 + Math.random() * 900000).toString();
+            coupons.push(`PROMO${secondCode}`);
+          }
+
+          return { ...rest, availableCoupons: coupons };
+        });
+      }
+    });
+
+    this.apiService.getFoodsByCity(city).subscribe({
+      next: (data) => {
+        const allData = data || [];
+        const burgersList = allData.filter(item => 
+          item.category === 'X-Burgers' || 
+          item.category === 'Burgers' ||
+          item.name.toLowerCase().includes('burger') || 
+          item.name.toLowerCase().includes('xis')
+        );
+        const foodsList = allData.filter(item => !burgersList.includes(item));
+
+        this.foods = foodsList.length > 0 ? foodsList : allData;
+        this.burgers = burgersList.length > 0 ? burgersList : allData;
+      }
+    });
+
+    this.drinksAndDesserts = [
+      { id: 991, name: 'Milkshake de Ninho', price: 16.90, rating: 4.8, time: '15-25 min', fee: '4.99', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=500&q=80' },
+      { id: 992, name: 'Petit Gateau', price: 14.00, rating: 4.9, time: '20-30 min', fee: '5.00', image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=500&q=80' },
+      { id: 993, name: 'Açaí Tradicional 500ml', price: 22.00, rating: 4.7, time: '15-20 min', fee: '3.99', image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=500&q=80' },
+      { id: 994, name: 'Suco Natural Laranja 1L', price: 12.00, rating: 4.6, time: '10-20 min', fee: '3.00', image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=500&q=80' }
+    ];
   }
 }

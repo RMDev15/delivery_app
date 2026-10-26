@@ -1,12 +1,12 @@
 <header class="header">
-  <div class="location-wrapper" (click)="toggleLocationMenu()">
+  <div class="location-wrapper" (click)="toggleLocationMenu($event)">
     <div class="location">
       <span>📍 {{ selectedLocation }}</span>
       <span class="dropdown-icon">▼</span>
     </div>
     <!-- Dropdown de Cidades -->
     <div class="location-dropdown" *ngIf="showLocationMenu">
-      <div class="location-item" *ngFor="let loc of locations" (click)="selectLocation(loc)">
+      <div class="location-item" *ngFor="let loc of locations" (click)="selectLocation(loc, $event)">
         📍 {{ loc }}
       </div>
     </div>
@@ -23,7 +23,7 @@
       <h2>Destaque Regional</h2>
       <h1>{{ banners[currentBannerIndex].title }}</h1>
       <p>{{ banners[currentBannerIndex].subtitle }}</p>
-      <button class="order-btn" routerLink="/search">VER OFERTAS</button>
+      <button class="order-btn" (click)="onBannerClick(banners[currentBannerIndex])">APLICAR CUPOM</button>
     </div>
     <div class="discount-badge">{{ banners[currentBannerIndex].discount }}</div>
   </div>
@@ -39,13 +39,12 @@
     <div class="controls-wrapper">
       <button class="nav-btn" (click)="scrollManual(foodScroll, -1)">‹</button>
       <button class="nav-btn" (click)="scrollManual(foodScroll, 1)">›</button>
-      <a routerLink="/search" class="see-more">Ver mais</a>
     </div>
   </div>
   <div class="horizontal-scroll" #foodScroll>
-    <div class="food-card" *ngFor="let food of foods">
+    <div class="food-card" *ngFor="let food of foods" (click)="openProductModal(food)" style="cursor: pointer;">
       <div class="card-image-wrapper">
-        <img [src]="food.image" [alt]="food.name">
+        <img [src]="food.image_url || food.image" [alt]="food.name">
         <div class="rating">⭐ {{ food.rating || 4.8 }}</div>
       </div>
       <div class="card-info">
@@ -64,18 +63,17 @@
     <div class="controls-wrapper">
       <button class="nav-btn" (click)="scrollManual(burgerScroll, -1)">‹</button>
       <button class="nav-btn" (click)="scrollManual(burgerScroll, 1)">›</button>
-      <a routerLink="/search" class="see-more">Ver todos</a>
     </div>
   </div>
   <div class="horizontal-scroll" #burgerScroll>
-    <div class="food-card" *ngFor="let item of burgers">
+    <div class="food-card" *ngFor="let item of burgers" (click)="openProductModal(item)" style="cursor: pointer;">
       <div class="card-image-wrapper">
-        <img [src]="item.image" [alt]="item.name">
+        <img [src]="item.image_url || item.image" [alt]="item.name">
         <div class="rating">⭐ 4.9</div>
       </div>
       <div class="card-info">
-        <span class="price">R$ {{ (item.price * 1.1) | number:'1.2-2' }}</span>
-        <h3 class="title">Artesanal {{ item.name }}</h3>
+        <span class="price">R$ {{ item.price | number:'1.2-2' }}</span>
+        <h3 class="title">{{ item.name }}</h3>
         <p class="details">25-35 min - Entrega Grátis</p>
       </div>
     </div>
@@ -89,13 +87,12 @@
     <div class="controls-wrapper">
       <button class="nav-btn" (click)="scrollManual(restScroll, -1)">‹</button>
       <button class="nav-btn" (click)="scrollManual(restScroll, 1)">›</button>
-      <a routerLink="/search" class="see-more">Ver todos</a>
     </div>
   </div>
   <div class="horizontal-scroll restaurants-scroll" #restScroll>
-    <div class="restaurant-card" *ngFor="let rest of restaurants">
+    <div class="restaurant-card" *ngFor="let rest of restaurants" [routerLink]="['/restaurante', rest.id]" style="cursor: pointer;">
       <div class="restaurant-logo">
-        <img [src]="rest.image" [alt]="rest.name">
+        <img [src]="rest.image_url || rest.image" [alt]="rest.name">
       </div>
       <span class="restaurant-name">{{ rest.name }}</span>
     </div>
@@ -109,11 +106,10 @@
     <div class="controls-wrapper">
       <button class="nav-btn" (click)="scrollManual(drinkScroll, -1)">‹</button>
       <button class="nav-btn" (click)="scrollManual(drinkScroll, 1)">›</button>
-      <a routerLink="/search" class="see-more">Ver mais</a>
     </div>
   </div>
   <div class="horizontal-scroll" #drinkScroll>
-    <div class="food-card" *ngFor="let item of drinksAndDesserts">
+    <div class="food-card" *ngFor="let item of drinksAndDesserts" (click)="openProductModal(item)" style="cursor: pointer;">
       <div class="card-image-wrapper">
         <img [src]="item.image" [alt]="item.name">
         <div class="rating">⭐ {{ item.rating }}</div>
@@ -126,3 +122,33 @@
     </div>
   </div>
 </section>
+
+<!-- Modal de Produto Selecionado na Home -->
+<div class="modal-overlay" *ngIf="selectedProduct" (click)="closeProductModal()" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; display:flex; justify-content:center; align-items:center;">
+  <div class="modal-content" (click)="$event.stopPropagation()" style="background:white; padding:20px; border-radius:12px; width:90%; max-width:400px; position:relative;">
+    <button class="modal-close" (click)="closeProductModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+    <img [src]="selectedProduct.image_url || selectedProduct.image" [alt]="selectedProduct.name" style="width:100%; height:150px; object-fit:cover; border-radius:8px;" />
+    
+    <h3 style="margin:10px 0 5px 0;">{{ selectedProduct.name }}</h3>
+    <p style="color:#666; font-size:0.9rem;">{{ selectedProduct.description || 'Produto artesanal da região.' }}</p>
+    <p style="color:#2ed573; font-weight:bold; font-size:1.1rem;">R$ {{ selectedProduct.price | number:'1.2-2' }}</p>
+
+    <div style="margin:15px 0;">
+      <label style="display:block; margin-bottom:5px; font-size:0.85rem; font-weight:bold;">Observações:</label>
+      <input type="text" [(ngModel)]="productObs" placeholder="Ex: Sem cebola, ponto da carne..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;" />
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div style="display:flex; gap:8px; align-items:center; background:#f1f2f6; padding:6px 10px; border-radius:6px;">
+        <button (click)="productQuantity = productQuantity > 1 ? productQuantity - 1 : 1" style="background:none; border:none; font-weight:bold; cursor:pointer;">-</button>
+        <span>{{ productQuantity }}</span>
+        <button (click)="productQuantity = productQuantity + 1" style="background:none; border:none; font-weight:bold; cursor:pointer;">+</button>
+      </div>
+      <button (click)="addToCartFromHome()" style="flex:1; background:#2ed573; color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">
+        Adicionar • R$ {{ (selectedProduct.price * productQuantity) | number:'1.2-2' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-cart-drawer></app-cart-drawer>
