@@ -4,7 +4,7 @@
       <span>📍 {{ selectedLocation }}</span>
       <span class="dropdown-icon">▼</span>
     </div>
-    <!-- Menu Dropdown de Cidades -->
+    <!-- Dropdown de Cidades -->
     <div class="location-dropdown" *ngIf="showLocationMenu">
       <div class="location-item" *ngFor="let loc of locations" (click)="selectLocation(loc)">
         📍 {{ loc }}
@@ -16,7 +16,7 @@
   </div>
 </header>
 
-<!-- Banner Promocional em Carrossel Automático -->
+<!-- Banner Promocional Automático -->
 <section class="banner-section">
   <div class="banner" [style.background]="banners[currentBannerIndex].bg">
     <div class="banner-content">
@@ -27,19 +27,22 @@
     </div>
     <div class="discount-badge">{{ banners[currentBannerIndex].discount }}</div>
   </div>
-  <!-- Indicadores do carrossel -->
   <div class="carousel-dots">
     <span *ngFor="let b of banners; let i = index" [class.active]="i === currentBannerIndex"></span>
   </div>
 </section>
 
-<!-- Comidas Recomendadas -->
+<!-- 1. Comidas Recomendadas (Carrossel) -->
 <section class="section">
   <div class="section-header">
     <h2>Comidas Recomendadas</h2>
-    <a routerLink="/search" class="see-more">Ver mais</a>
+    <div class="controls-wrapper">
+      <button class="nav-btn" (click)="scrollManual(foodScroll, -1)">‹</button>
+      <button class="nav-btn" (click)="scrollManual(foodScroll, 1)">›</button>
+      <a routerLink="/search" class="see-more">Ver mais</a>
+    </div>
   </div>
-  <div class="horizontal-scroll">
+  <div class="horizontal-scroll" #foodScroll>
     <div class="food-card" *ngFor="let food of foods">
       <div class="card-image-wrapper">
         <img [src]="food.image" [alt]="food.name">
@@ -54,34 +57,42 @@
   </div>
 </section>
 
-<!-- Nova Seção: Lanches & X-Burgers Artesanais -->
+<!-- 2. X-Burgers & Artesanais (Carrossel) -->
 <section class="section">
   <div class="section-header">
     <h2>X-Burgers & Artesanais</h2>
-    <a routerLink="/search" class="see-more">Ver todos</a>
+    <div class="controls-wrapper">
+      <button class="nav-btn" (click)="scrollManual(burgerScroll, -1)">‹</button>
+      <button class="nav-btn" (click)="scrollManual(burgerScroll, 1)">›</button>
+      <a routerLink="/search" class="see-more">Ver todos</a>
+    </div>
   </div>
-  <div class="horizontal-scroll">
-    <div class="food-card" *ngFor="let food of foods">
+  <div class="horizontal-scroll" #burgerScroll>
+    <div class="food-card" *ngFor="let item of burgers">
       <div class="card-image-wrapper">
-        <img [src]="food.image" [alt]="food.name">
+        <img [src]="item.image" [alt]="item.name">
         <div class="rating">⭐ 4.9</div>
       </div>
       <div class="card-info">
-        <span class="price">R$ {{ (food.price * 1.1) | number:'1.2-2' }}</span>
-        <h3 class="title">Super {{ food.name }}</h3>
+        <span class="price">R$ {{ (item.price * 1.1) | number:'1.2-2' }}</span>
+        <h3 class="title">Artesanal {{ item.name }}</h3>
         <p class="details">25-35 min - Entrega Grátis</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Restaurantes Recomendados -->
+<!-- 3. Restaurantes Recomendados (Carrossel) -->
 <section class="section">
   <div class="section-header">
     <h2>Restaurantes Recomendados</h2>
-    <a routerLink="/search" class="see-more">Ver todos</a>
+    <div class="controls-wrapper">
+      <button class="nav-btn" (click)="scrollManual(restScroll, -1)">‹</button>
+      <button class="nav-btn" (click)="scrollManual(restScroll, 1)">›</button>
+      <a routerLink="/search" class="see-more">Ver todos</a>
+    </div>
   </div>
-  <div class="horizontal-scroll restaurants-scroll">
+  <div class="horizontal-scroll restaurants-scroll" #restScroll>
     <div class="restaurant-card" *ngFor="let rest of restaurants">
       <div class="restaurant-logo">
         <img [src]="rest.image" [alt]="rest.name">
@@ -91,33 +102,26 @@
   </div>
 </section>
 
-<!-- Nova Seção: Bebidas & Sobremesas -->
+<!-- 4. Bebidas & Sobremesas (Carrossel) -->
 <section class="section">
   <div class="section-header">
     <h2>Bebidas & Sobremesas</h2>
-    <a routerLink="/search" class="see-more">Ver mais</a>
-  </div>
-  <div class="horizontal-scroll">
-    <div class="food-card">
-      <div class="card-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=500&q=80" alt="Milkshake">
-        <div class="rating">⭐ 4.7</div>
-      </div>
-      <div class="card-info">
-        <span class="price">R$ 16.90</span>
-        <h3 class="title">Milkshake de Ninho</h3>
-        <p class="details">15-25 min - R$ 4.99</p>
-      </div>
+    <div class="controls-wrapper">
+      <button class="nav-btn" (click)="scrollManual(drinkScroll, -1)">‹</button>
+      <button class="nav-btn" (click)="scrollManual(drinkScroll, 1)">›</button>
+      <a routerLink="/search" class="see-more">Ver mais</a>
     </div>
-    <div class="food-card">
+  </div>
+  <div class="horizontal-scroll" #drinkScroll>
+    <div class="food-card" *ngFor="let item of drinksAndDesserts">
       <div class="card-image-wrapper">
-        <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=500&q=80" alt="Sobremesa">
-        <div class="rating">⭐ 4.9</div>
+        <img [src]="item.image" [alt]="item.name">
+        <div class="rating">⭐ {{ item.rating }}</div>
       </div>
       <div class="card-info">
-        <span class="price">R$ 14.00</span>
-        <h3 class="title">Petit Gateau</h3>
-        <p class="details">20-30 min - R$ 5.00</p>
+        <span class="price">R$ {{ item.price | number:'1.2-2' }}</span>
+        <h3 class="title">{{ item.name }}</h3>
+        <p class="details">{{ item.time }} - R$ {{ item.fee }}</p>
       </div>
     </div>
   </div>
